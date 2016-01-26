@@ -1,0 +1,389 @@
+Index: FFSolver.cpp
+===================================================================
+RCS file: /var/network/cvs_repositories/planning/popf2/FFSolver.cpp,v
+retrieving revision 1.22
+diff -r1.22 FFSolver.cpp
+54a55
+> 
+248a250,397
+> 
+> #ifdef DOUBLESTATEHASH
+> 
+> int compareVecs(const vector<double> & a, const vector<double> & b);
+> int compareMaps(const map<int, int> & a, const map<int, int> & b);
+> int compareMaps(const map<int, set<int> > & a, const map<int, set<int> > & b);
+> int compareMaps(const map<int, map<int, int> > & a, const map<int, map<int, int> > & b);
+> int compareLists(const list<StartEvent> & a, const list<StartEvent> & b);
+> 
+> int oldCompareSets(const map<int, PropositionAnnotation> & a, const map<int, PropositionAnnotation> & b)
+> {
+>     map<int, PropositionAnnotation>::const_iterator aItr = a.begin();
+>     const map<int, PropositionAnnotation>::const_iterator aEnd = a.end();
+> 
+>     map<int, PropositionAnnotation>::const_iterator bItr = b.begin();
+>     const map<int, PropositionAnnotation>::const_iterator bEnd = b.end();
+> 
+>     for (; aItr != aEnd && bItr != bEnd; ++aItr, ++bItr) {
+>         if (aItr->first < bItr->first) return true;
+>         if (aItr->first > bItr->first) return false;
+>     }
+> 
+>     if (aItr == aEnd && bItr != bEnd) return true;
+>     if (aItr != aEnd && bItr == bEnd) return false;
+>         
+>     return false;
+> }
+> 
+> 
+> struct OldCompareStates {
+> 
+> 
+>     bool operator()(const ExtendedMinimalState & ae, const ExtendedMinimalState & be) const {
+>         
+>         const MinimalState & a = ae.getInnerState();
+>         const MinimalState & b = be.getInnerState();
+>         
+>         const int csVal = CSBase::oldCompareSets(a.first, b.first);
+>         if (csVal > 0) {
+>             return true;
+>         } else if (csVal < 0) {
+>             return false;
+>         }
+>         
+>         const int cv1Val = CSBase::compareVecs(a.secondMin, b.secondMin);
+>         if (cv1Val > 0) {
+>             return true;
+>         } else if (cv1Val < 0) {
+>             return false;
+>         }
+> 
+>         const int cv2Val = CSBase::compareVecs(a.secondMax, b.secondMax);
+>         if (cv2Val > 0) {
+>             return true;
+>         } else if (cv2Val < 0) {
+>             return false;
+>         }
+> 
+>     
+>         const int saVal = CSBase::compareMaps(a.startedActions, b.startedActions);
+> 
+>         if (saVal > 0) {
+>             return true;
+>         } else if (saVal < 0) {
+>             return false;
+>         }
+> 
+> /*      const int invVal = CSBase::compareMaps(a.invariants, b.invariants);
+> 
+>         if (invVal > 0) {
+>             return true;
+>         } else if (invVal < 0) {
+>             return false;
+>         }*/
+>     
+>         const int ceVal = CSBase::compareLists(ae.startEventQueue, be.startEventQueue);
+> 
+>         if (ceVal > 0) {
+>             return true;
+>         } else if (ceVal < 0) {
+>             return false;
+>         }
+>       
+>         if (a.nextTIL < b.nextTIL) return true;
+>         if (a.nextTIL > b.nextTIL) return false;
+> 
+>         return false;
+>     }
+> 
+> };
+> 
+> 
+> struct OldCompareStatesZealously {
+> 
+> 
+>     bool operator()(const ExtendedMinimalState & ae, const ExtendedMinimalState & be) const {
+> 
+>         const MinimalState & a = ae.getInnerState();
+>         const MinimalState & b = be.getInnerState();
+>         
+>         const int csVal = CSBase::oldCompareSets(a.first, b.first);
+>         if (csVal > 0) {
+>             return true;
+>         } else if (csVal < 0) {
+>             return false;
+>         }
+>         
+>         const int cv1Val = CSBase::compareVecs(a.secondMin, b.secondMin);
+>         if (cv1Val > 0) {
+>             return true;
+>         } else if (cv1Val < 0) {
+>             return false;
+>         }
+> 
+>         const int cv2Val = CSBase::compareVecs(a.secondMax, b.secondMax);
+>         if (cv2Val > 0) {
+>             return true;
+>         } else if (cv2Val < 0) {
+>             return false;
+>         }
+>     
+>         const int saVal = CSBase::compareMaps(a.startedActions, b.startedActions);
+> 
+>         if (saVal > 0) {
+>             return true;
+>         } else if (saVal < 0) {
+>             return false;
+>         }
+> 
+>         /*const int invVal = CSBase::compareMaps(a.invariants, b.invariants);
+> 
+>         if (invVal > 0) {
+>             return true;
+>         } else if (invVal < 0) {
+>             return false;
+>         }
+>           */
+>         if (a.nextTIL < b.nextTIL) return true;
+>         if (a.nextTIL > b.nextTIL) return false;
+> 
+>         return false;
+>     }
+> 
+> };
+> 
+> 
+> #endif
+> 
+675a825,889
+> bool StrongExtendedStateLessThan::operator()(const ExtendedMinimalState * const ae, const ExtendedMinimalState * const be) {
+>     return operator()(*ae, *be);
+> }
+> 
+> bool StrongExtendedStateLessThan::operator()(const ExtendedMinimalState & ae, const ExtendedMinimalState & be) {
+> 
+>     const MinimalState & a = ae.getInnerState();
+>     const MinimalState & b = be.getInnerState();
+>     
+>     const int csVal = CSBase::compareSets(a.first, b.first, true);
+>     if (csVal > 0) {
+>             return true;
+>     } else if (csVal < 0) {
+>             return false;
+>     }
+>     
+>     const int cv1Val = CSBase::compareVecs(a.secondMin, b.secondMin);
+>     if (cv1Val > 0) {
+>             return true;
+>     } else if (cv1Val < 0) {
+>             return false;
+>     }
+> 
+>     const int cv2Val = CSBase::compareVecs(a.secondMax, b.secondMax);
+>     if (cv2Val > 0) {
+>             return true;
+>     } else if (cv2Val < 0) {
+>             return false;
+>     }
+> 
+> 
+>     const int saVal = CSBase::compareMaps(a.startedActions, b.startedActions);
+> 
+>     if (saVal > 0) {
+>             return true;
+>     } else if (saVal < 0) {
+>             return false;
+>     }
+> 
+> /*      const int invVal = CSBase::compareMaps(a.invariants, b.invariants);
+> 
+>     if (invVal > 0) {
+>             return true;
+>     } else if (invVal < 0) {
+>             return false;
+>     }*/
+> 
+>     const int ceVal = CSBase::compareLists(ae.startEventQueue, be.startEventQueue);
+> 
+>     if (ceVal > 0) {
+>             return true;
+>     } else if (ceVal < 0) {
+>             return false;
+>     }
+> 
+>     if (a.nextTIL < b.nextTIL) return true;
+>     if (a.nextTIL > b.nextTIL) return false;
+> 
+>     return false;
+>         
+> 
+> };
+> 
+> 
+> 
+2799a3014,3073
+> 
+> #ifdef DOUBLESTATEHASH
+> template<typename T>
+> class DoubleStateHash : public map<ExtendedMinimalState*, double, T > {
+> 
+> private:
+>     bool ownPtrs;
+>     
+>     list<ExtendedMinimalState*> gc;
+> public:
+>     
+>     
+>     DoubleStateHash()
+>     : ownPtrs(true)
+>     {
+>     }
+>     
+>     ~DoubleStateHash()
+>     {
+>     }
+>     
+>     void clearUp()
+>     {
+>         if (ownPtrs) {
+>             if (Globals::globalVerbosity & 1) cout << "Cleaning up double state hash\n";
+>             typename map<ExtendedMinimalState*, double, T >::iterator itr = map<ExtendedMinimalState*, double, T >::begin();
+>             const typename map<ExtendedMinimalState*, double, T >::iterator itrEnd = map<ExtendedMinimalState*, double, T >::end();
+>             
+>             for (; itr != itrEnd; ++itr) {
+>                 delete itr->first;
+>             }            
+>         }
+>         
+>         map<ExtendedMinimalState*, double, T>::clear();
+>                 
+>         {
+>             list<ExtendedMinimalState*>::iterator cItr = gc.begin();
+>             const list<ExtendedMinimalState*>::iterator cEnd = gc.end();
+>             
+>             for (; cItr != cEnd; ++cItr) {
+>                 delete *cItr;
+>             }
+>             gc.clear();
+>         }        
+>     }
+>     
+>     void setOwnPtrs(const bool & b)
+>     {
+>         ownPtrs = b;
+>     }
+>     
+>     void alsoCleanUp(ExtendedMinimalState * const c)
+>     {
+>         gc.push_back(c);
+>     }
+>     
+> };
+> 
+> #endif
+> 
+3408a3683,3687
+> #ifdef DOUBLESTATEHASH
+>     map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double > >, OldCompareStates> oldVisitedStates;
+>     map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double > >, OldCompareStatesZealously> oldZealousVisitedStates;    
+> #endif    
+> 
+3451a3731,3741
+>         
+> #ifdef DOUBLESTATEHASH
+>         {
+>             list<pair<pair<HTrio, bool>, double> > tList;
+>             tList.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(bestHeuristic, false), 0.0));
+>             
+>             oldVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*toHash, tList));
+>             oldZealousVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*toHash, tList));            
+>         }        
+> #endif
+> 
+3614a3905,3909
+> #ifdef DOUBLESTATEHASH
+>                 map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> >, OldCompareStatesZealously>::iterator zvsItr;
+>                 map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> >, OldCompareStates>::iterator vsItr;
+> #endif
+> 
+3639d3933
+<                 }
+3640a3935,3952
+> #ifdef DOUBLESTATEHASH
+>                     if (zealousEHC) {
+>                         zvsItr = oldZealousVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*hunting, list<pair<pair<HTrio, bool>, double> >())).first;
+>                         if (zvsItr->second.empty()) {
+>                             assert(visitTheState);
+>                         } else {
+>                             assert(!visitTheState);
+>                         }
+>                     } else {
+>                         vsItr = visitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*hunting, list<pair<pair<HTrio, bool>, double> >())).first;
+>                         if (vsItr->second.empty()) {
+>                             assert(visitTheState);
+>                         } else {
+>                             assert(!visitTheState);
+>                         }
+>                     }
+> #endif
+>                 }
+3669a3982,3988
+> #ifdef DOUBLESTATEHASH
+>                         if (zealousEHC) {
+>                             zvsItr->second.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(succ->heuristicValue, false),succ->state().timeStamp));
+>                         } else {
+>                             vsItr->second.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(succ->heuristicValue, false),succ->state().timeStamp));
+>                         }
+> #endif  
+3719a4039,4044
+>     
+> #ifdef DOUBLESTATEHASH
+>     oldVisitedStates.clear();
+>     oldZealousVisitedStates.clear();
+> #endif
+>     
+3721a4047,4048
+>     
+>     
+3744a4072,4079
+>             
+> #ifdef DOUBLESTATEHASH
+>             list<pair<pair<HTrio, bool>, double> > tList;
+>             tList.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(bestHeuristic, true), 0.0));
+>             
+>             oldVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*toHash, tList));
+>             oldZealousVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*toHash, tList));
+> #endif
+3925a4261,4265
+> #ifdef DOUBLESTATEHASH
+>                 map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> >, OldCompareStatesZealously>::iterator zvsItr;
+>                 map<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> >, OldCompareStates>::iterator vsItr;
+> #endif
+>                 
+3948a4289,4309
+> #ifdef DOUBLESTATEHASH
+> 
+>                     int doubleVisitTheState = 0;
+>                     {
+>                         zvsItr = oldZealousVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*(succ->state()), list<pair<pair<HTrio, bool>, double> >())).first;
+>                         vsItr = oldVisitedStates.insert(pair<ExtendedMinimalState, list<pair<pair<HTrio, bool>, double> > >(*(succ->state()), list<pair<pair<HTrio, bool>, double> >())).first;
+>                         
+>                         if (vsItr->second.empty() || (fabs(vsItr->second.back().second - succ->state()->timeStamp) > 0.0005 && (vsItr->second.back().second > succ->state()->timeStamp))) {
+>                             doubleVisitTheState = 2;
+>                             if (zvsItr->second.empty()) {
+>                                 doubleVisitTheState = 1;
+>                             }
+>                             assert(visitTheState == doubleVisitTheState);
+>                         } else {
+>                             assert(visitTheState == 0);
+>                                                 
+>                         }
+>                         
+>                     }
+> #endif
+> 
+3981a4343,4347
+> #ifdef DOUBLESTATEHASH
+>                         vsItr->second.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(succ->heuristicValue, true),succ->state()->timeStamp));
+>                         zvsItr->second.push_back(pair<pair<HTrio, bool>, double>(pair<HTrio, bool>(succ->heuristicValue, true),succ->state()->timeStamp));
+> #endif
+>                         
