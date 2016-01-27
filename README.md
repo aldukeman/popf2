@@ -3,6 +3,17 @@ POPF2 planner from IPC 2011
 
 
 ```
+@conference{colespopficaps,
+  author = "A. J. Coles and A. I. Coles and M. Fox and D. Long",
+  title = "Forward-Chaining Partial-Order Planning",
+  booktitle = "Twentieth International Conference on Automated Planning and Scheduling (ICAPS 10)",
+  year = "2010",
+  publisher = "AAAI Press",
+  month = "May"
+}
+```
+
+```
 @article{coles2011popf2,
   title={POPF2: A forward-chaining partial order planner},
   author={Coles, Amanda and Coles, Andrew and Fox, Maria and Long, Derek},
@@ -37,6 +48,8 @@ following should suffice:
 
 sudo apt-get install cmake coinor-libcbc-dev coinor-libclp-dev \
                      coinor-libcoinutils-dev bison flex
+
+ALD: may also require coinor-libcgl-dev
 
 
 After that, run ./build

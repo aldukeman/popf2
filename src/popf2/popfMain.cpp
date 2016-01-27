@@ -29,6 +29,8 @@
 
 #include <sstream>
 
+#include <unistd.h>
+
 using std::ifstream;
 using std::cerr;
 using std::endl;

@@ -16,6 +16,8 @@
 
 #include <sys/times.h>
 
+#include <unistd.h>
+
 namespace Planner
 {
 

@@ -10,10 +10,12 @@
 #include <sstream>
 #include <iostream>
 
+#include <sys/times.h>
+
+#include <unistd.h>
+
 using std::ostringstream;
 using std::endl;
-
-#include <sys/times.h>
 
 namespace Planner {
 
