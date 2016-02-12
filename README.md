@@ -49,7 +49,7 @@ following should suffice:
 sudo apt-get install cmake coinor-libcbc-dev coinor-libclp-dev \
                      coinor-libcoinutils-dev bison flex
 
-ALD: may also require coinor-libcgl-dev
+ALD: may also require coinor-libcgl-dev, coinor-libosi-dev
 
 
 After that, run ./build
