@@ -172,6 +172,7 @@ private:
 protected:
     MinimalState * decorated;
     
+public:
     ExtendedMinimalState(const ExtendedMinimalState & e)
     : decorated(new MinimalState(*(e.decorated))), startEventQueue(e.startEventQueue), timeStamp(e.timeStamp), stepBeforeTIL(e.stepBeforeTIL), tilFanIn(e.tilFanIn), tilComesBefore(e.tilComesBefore)  {
 
@@ -186,6 +187,7 @@ protected:
 
     }
         
+protected:
     ExtendedMinimalState & operator=(const ExtendedMinimalState & e);
     
 public:

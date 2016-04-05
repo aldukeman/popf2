@@ -151,7 +151,8 @@ string threeDP(double d)
     return toReturn.str();
 }
 
-void FFEvent::printPlan(const list<FFEvent> & toPrint)
+void FFEvent::printPlan(const list<FFEvent> & toPrint, int statesEvaluated, double quality, 
+    ostream& out)
 {
     tms refReturn;
     times(&refReturn);
@@ -162,9 +163,9 @@ void FFEvent::printPlan(const list<FFEvent> & toPrint)
     int wholesecs = twodp / 100;
     int centisecs = twodp % 100;
 
-    cout << "; Time " << wholesecs << ".";
-    if (centisecs < 10) cout << "0";
-    cout << centisecs << "\n";
+    out << "; Time " << wholesecs << ".";
+    if (centisecs < 10) out << "0";
+    out << centisecs << "\n";
     list<FFEvent>::const_iterator planItr = toPrint.begin();
     const list<FFEvent>::const_iterator planEnd = toPrint.end();
     const int planSize = toPrint.size();
@@ -195,26 +196,26 @@ void FFEvent::printPlan(const list<FFEvent> & toPrint)
         for (; iItr != iEnd; ++iItr) {
             const FFEvent * const planItr = planVector[*iItr];
             if (planItr->lpTimestamp < 0.0000001) {
-                cout << "0.000";
+                out << "0.000";
             } else {
-                cout << threeDP(planItr->lpTimestamp);
+                out << threeDP(planItr->lpTimestamp);
             }
-            cout << ": " << *(planItr->action) << " ";
+            out << ": " << *(planItr->action) << " ";
             if (planItr->pairWithStep >= 0) {
                 const double dur = endTS[planItr->pairWithStep] - planItr->lpTimestamp;
-                cout << " [" << threeDP(dur) << "]";
+                out << " [" << threeDP(dur) << "]";
                 #ifdef STOCHASTICDURATIONS
-                cout << ";\t\t {" << planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "} {" << endSTS[planItr->pairWithStep] << "}";
+                out << ";\t\t {" << planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "} {" << endSTS[planItr->pairWithStep] << "}";
                 #endif
             } else if (RPGBuilder::getRPGDEs(planItr->action->getID()).empty()) {
-                cout << " [" << threeDP(RPGBuilder::getNonTemporalDurationToPrint()[planItr->action->getID()]) << "]";
+                out << " [" << threeDP(RPGBuilder::getNonTemporalDurationToPrint()[planItr->action->getID()]) << "]";
                 #ifdef STOCHASTICDURATIONS
-                cout << ";\t\t {" << planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "} {" << EPSILON + planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "}";
+                out << ";\t\t {" << planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "} {" << EPSILON + planItr->stochasticTimestamp->getTimestampForRPGHeuristic() << "}";
                 #endif                        
             } else {
                 assert(false);
             }
-            cout << endl;                                                            
+            out << endl;
         }
     }
 }

@@ -6,6 +6,7 @@ endif(COMMAND cmake_policy)
 
 project(colinroot)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ggdb")
 set(CMAKE_CXX_FLAGS_PROFILE "-pg -O -g")
 set(CMAKE_CXX_LINK_FLAGS_PROFILE "-pg -g")
 
