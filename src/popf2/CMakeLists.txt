@@ -18,7 +18,6 @@ find_package(OSI)
 #ENDIF(NOT DISABLE_CLP)
 
 find_package(Threads) # ALD: for resource monitoring
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDOUBLESTATEHASH") # will this help?
 
 include_directories(${val_SOURCE_DIR} ${val_SOURCE_DIR}/parsing ${val_BINARY_DIR} ${CLP_INCLUDES}/coin ${CBC_INCLUDES}/coin ${CPLEX_INCLUDES} ${CONCERT_INCLUDES})
 

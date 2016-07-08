@@ -436,6 +436,15 @@ int main(int argc, char * argv[])
             FF::doBenchmark(reachesGoals, spSoln);
         }
 
+        if(timing_output_file_name)
+        {
+            struct rusage r;
+            getrusage(RUSAGE_SELF, &r);
+            std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+            std::ofstream output(timing_output_file_name);
+            output << r.ru_maxrss << "," << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        }
+
         return 0;
     } else {
         cout << ";; Problem unsolvable!\n";

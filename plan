@@ -50,5 +50,6 @@ if (!(-e $prob)) {
 #
 #close IN;
 
+#exec("$dir/compile/popf2/popf3-clp", "-b", "-e", "-I", "-y", "$timing", "-a", "$soln", "$dom", "$prob")
+
 exec("$dir/compile/popf2/popf3-clp", "-b", "-e", "-I", "-y", "$timing", "-a", "$soln", "$dom", "$prob")
-#exec("$dir/compile/popf2/popf3-clp", "-E", "-I", "-y", "$timing", "-a", "$soln", "$dom", "$prob")
