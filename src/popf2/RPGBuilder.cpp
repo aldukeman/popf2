@@ -187,7 +187,7 @@ public:
             cout << "...cannot be found either in the initial state, as an add effect of an\n";
             cout << " action, or as a timed initial literal.  As such, the problem has been deemed\n";
             cout << "unsolvable.\n";
-            exit(0);
+            exit(1);
         }
     };
 

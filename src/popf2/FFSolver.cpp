@@ -4372,6 +4372,7 @@ Solution FF::search(bool & reachedGoal)
 
     if (!bestFirstSearch) {
         cout << "\nProblem unsolvable by EHC, and best-first search has been disabled\n";
+        exit(2);
 
         reachedGoal = false;        
         return workingBestSolution;
